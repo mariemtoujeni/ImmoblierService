@@ -1,35 +1,66 @@
 import React, { useEffect, useState } from "react";
 import { getAllOperations } from "../services/operationService.js";
-import { Container, Row, Col, Card, Button, Table } from 'react-bootstrap';
+import { getAllCompanies } from "../services/companyService.js";
+import { Container, Row, Col, Card, Button, Table, Spinner } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 
 const Operation = () => {
-  const [operations, setOperations] = useState([]);
-  const [error, setError] = useState("");
+    const [operations, setOperations] = useState([]);    
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
 
-  useEffect(() => {
-    const fetchOperations = async () => {
-      try {
-        const data = await getAllOperations();
-        console.log('Données reçues :', data)
-        setOperations(data);
-      } catch (err) {
-        setError("Erreur lors du chargement des opérations");
-      }
-    };
-    fetchOperations();
-  }, []);
-  // Affichage en cas d'erreur
-  if (error) {
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                // Récupère les opérations et les sociétés
+                const [operationsData, companiesData] = await Promise.all([
+                    getAllOperations(),
+                    getAllCompanies(),
+                ]);
+
+                // Associe chaque opération à sa société
+                const operationsWithCompanyNames = operationsData.map((operation) => {
+                    const company = companiesData.find((c) => c.id === operation.companyId);
+                    return {
+                        ...operation,
+                        company: company || { name: "Société inconnue" }, // Gère le cas où la société n'est pas trouvée
+                    };
+                });
+
+                setOperations(operationsWithCompanyNames);
+            } catch (err) {
+                setError("Erreur lors du chargement des données");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchData();
+    }, []);
+
+    // Affichage pendant le chargement
+    if (loading) {
+        return (
+            <Container className="mt-4 text-center">
+                <Spinner animation="border" role="status">
+                    <span className="visually-hidden">Chargement...</span>
+                </Spinner>
+                <p>Chargement des opérations...</p>
+            </Container>
+        );
+    }
+
+    // Affichage en cas d'erreur
+    if (error) {
+        return (
+            <Container className="mt-4 text-center">
+                <p className="text-danger">Erreur : {error}</p>
+            </Container>
+        );
+    }
+
     return (
-        <Container className="mt-4 text-center">
-            <p className="text-danger">Erreur : {error}</p>
-        </Container>
-    );
-}
-
-  return (
-    <Container className="mt-4">
+        <Container className="mt-4">
             {/* Titre de la page */}
             <Row className="text-center mb-4">
                 <Col>
@@ -61,31 +92,17 @@ const Operation = () => {
                                         <th>Adresse</th>
                                         <th>Lots disponibles</th>
                                         <th>Lots réservés</th>
-                                        <th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {operations.map((operation) => (
                                         <tr key={operation.id}>
                                             <td>{operation.commercialName}</td>
-                                            <td>{operation.company}</td>
+                                            <td>{operation.company.name}</td> {/* Affiche le nom de la société */}
                                             <td>{new Date(operation.deliveryDate).toLocaleDateString("fr-FR")}</td>
                                             <td>{operation.address}</td>
                                             <td>{operation.availableLots}</td>
                                             <td>{operation.reservedLots}</td>
-                                            <td>
-                                                <Button
-                                                    variant="info"
-                                                    size="sm"
-                                                    as={Link}
-                                                    to={`/operations/${operation.id}`}
-                                                >
-                                                    Détails
-                                                </Button>{' '}
-                                                <Button variant="danger" size="sm">
-                                                    Supprimer
-                                                </Button>
-                                            </td>
                                         </tr>
                                     ))}
                                 </tbody>
@@ -95,9 +112,7 @@ const Operation = () => {
                 </Col>
             </Row>
         </Container>
-    
-        
-  );
+    );
 };
 
 export default Operation;

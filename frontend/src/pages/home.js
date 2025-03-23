@@ -50,7 +50,7 @@ const Home = () => {
                             <Card.Text>
                                 Consultez et gérez les sociétés immobilières rattachées à vos opérations.
                             </Card.Text>
-                            <Button variant="success" href="/societes" title='Gérez les sociétés immobilières '>
+                            <Button variant="success" href="/companies" title='Gérez les sociétés immobilières '>
                                 Voir les sociétés
                             </Button>
                         </Card.Body>

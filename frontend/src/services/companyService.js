@@ -10,11 +10,12 @@ export const addCompany = async (companyData) => {
     throw error.response ? error.response.data : new Error("Erreur serveur");
   }
 };
-export const getAllCompanies = async (companyData) => {
+export const getAllCompanies = async  () => {
     try {
-      const response = await axios.post(API_URL, companyData);
+      const response = await axios.get(API_URL);
       return response.data; 
     } catch (error) {
+      console.error("Erreur Axios :", error);
       throw error.response ? error.response.data : new Error("Erreur serveur");
     }
   };
