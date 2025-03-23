@@ -1,0 +1,18 @@
+.custom-card {
+    transition: transform 0.2s ease-in-out;
+}
+
+.custom-card:hover {
+    transform: translateY(-5px); /* Effet de survol */
+}
+
+.custom-button {
+    margin-top: 15px;
+    width: 100%; /* Boutons de largeur égale */
+}
+
+.card-img-top {
+    height: 300px; 
+    object-fit: cover; 
+    width: 100%; 
+}

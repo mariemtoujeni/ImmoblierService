@@ -61,14 +61,14 @@ export const addOperation = async (req, res) => {
   }
 };
 export function getAllOperation(req,res){
-  Company.find()
+  Operation.find()
     .select("commercialName company deliveryDate address availableLots reservedLots")
-    .then((companies) => {
-      res.status(200).json(companies);
+    .then((operations) => {
+      res.status(200).json(operations);
     })
     .catch((error) => {
       res
         .status(500)
-        .json({ error: "Erreur lors de la récupération des companies" });
+        .json({ error: "Erreur lors de la récupération des opérations" });
     });
 };
